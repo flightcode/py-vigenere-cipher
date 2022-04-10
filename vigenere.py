@@ -74,9 +74,9 @@ def encrypt(decrypted, key, output=""): # Encrypt string (OPTIONAL output filena
 
             cPos = ord(c) - start # Get position of char
             shift = ord(key[i % len(key)]) - upperStart # Get shift amount based on keyPos (Key is in uppercase)
-            cNewPos = start + (cPos + shift) % 26 # Get position of shifted char
+            cNewPos = (cPos + shift) % 26 # Get position of shifted char
             
-            encrypted += chr(cNewPos) # Add character to encrypted string
+            encrypted += chr(cNewPos + start) # Add character to encrypted string
             i += 1
         else: # If not alphanumeric
             encrypted += c
