@@ -50,7 +50,7 @@ def main(): # Welcome message and run menu
                     print(f"--- OUTPUT to '{fileName}' ---")
                     print("--- FINISH ENCRYPTION ---")
                 else:
-                    errorMessage("Key not specified!")
+                    return errorMessage("Key not specified!")
             elif mode == "decrypt":
                 print("--- START DECRYPTION ---")
                     # TODO: Get all possible decryptions
@@ -58,9 +58,9 @@ def main(): # Welcome message and run menu
                     # TODO: Output lowest error value
                 print("--- FINISH DECRYPTION ---")
         else:
-            errorMessage("File not specified!")
+            return errorMessage("File not specified!")
     else:
-        errorMessage("Invalid mode specified!")
+        return errorMessage("Invalid mode specified!")
 
 def encrypt(decrypted, key): # Encrypt string    
     key = key.upper()
@@ -110,9 +110,12 @@ def menu(): # Menu Options
         if option == 1: # Encrypt
             decrypted = input("Enter message: ")
             key = input("Enter key: ")
-            print("--- START ENCRYPTION ---")
-            print(f"Encrypted: {encrypt(decrypted,key)}") # Output encrypted value
-            print("--- FINISH ENCRYPTION ---")
+            if key != "":
+                print("--- START ENCRYPTION ---")
+                print(f"Encrypted: {encrypt(decrypted,key)}") # Output encrypted value
+                print("--- FINISH ENCRYPTION ---")
+            else:
+                return errorMessage("Key not specified!")
         elif option == 2: # Decrypt
             encrypted = input("Enter message: ")
             print("--- START DECRYPTION ---")
@@ -124,6 +127,6 @@ def menu(): # Menu Options
             print("--- GOODBYE ---")
             menuLoop = False
         else:
-            errorMessage("Invalid option!")
+            return errorMessage("Invalid option!")
 
 if __name__ == '__main__': main()
