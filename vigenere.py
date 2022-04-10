@@ -62,7 +62,11 @@ def main(): # Welcome message and run menu
     else:
         return errorMessage("Invalid mode specified!")
 
-def encrypt(decrypted, key): # Encrypt string    
+def encrypt(decrypted, key): # Encrypt string with given key    
+    # Encrypts using iterated-key method, where for each character in string, 
+    # character is encrypted by nth character in string (modulo key length. 
+    # This simulates a key of same length as string, but is more memory efficient)
+    
     key = key.upper()
     lowerStart = ord('a') # Start shift for 'a' in lowercase
     upperStart = ord('A') # Start shift for 'A' in uppercase
@@ -86,7 +90,7 @@ def encrypt(decrypted, key): # Encrypt string
             encrypted += c
     return encrypted
 
-def decrypt(encrypted, key): # Decrypt string
+def decrypt(encrypted, key): # Decrypt string with given key
     # TODO: Do work
     print("DECRYPTING...") # Placeholder
 
