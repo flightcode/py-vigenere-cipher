@@ -53,11 +53,11 @@ def encrypt(decrypted, key, output=""): # Encrypt string (OPTIONAL output filena
         print(f"Key: {key}")
     
     key = key.upper()
-    keyPos = 0 # Current position of key to use in shift
     lowerStart = ord('a') # Start shift for 'a' in lowercase
     upperStart = ord('A') # Start shift for 'A' in uppercase
     encrypted = ""
 
+    i = 0
     for c in decrypted:
         if c.isalpha():
             if c.isupper(): # Uppercase shift
@@ -66,14 +66,11 @@ def encrypt(decrypted, key, output=""): # Encrypt string (OPTIONAL output filena
                 start = lowerStart
 
             cPos = ord(c) - start # Get position of char
-            shift = ord(key[keyPos]) - upperStart # Get shift amount based on keyPos (Key is in uppercase)
+            shift = ord(key[i % len(key)]) - upperStart # Get shift amount based on keyPos (Key is in uppercase)
             cNewPos = start + (cPos + shift) % 26 # Get position of shifted char
-
-            keyPos += 1
-            if keyPos >= len(key): # Completed full cycle of key length 
-                keyPos = 0
             
             encrypted += chr(cNewPos) # Add character to encrypted string
+            i += 1
         else: # If not alphanumeric
             encrypted += c
 
