@@ -1,6 +1,13 @@
 #!/usr/local/opt/python@3.10/bin/python3
+
+# Vigenere cipher encoder/decoder.
 # github.com/flightcode
 # 2022
+# USAGE: 
+#   python3 vigenere.py 
+#       -m (e|encrypt, d|decrypt, i|interactive) 
+#       [-f <filename> (required if -m not i|interactive)]
+#       [-k <key> (required if -m e|encrypt)]
 
 import sys # For CLI rguments
 import getopt # Parses CLI arguments
