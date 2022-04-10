@@ -33,9 +33,9 @@ def main(): # Welcome message and run menu
         elif opt in ['-k']:
             key = arg
 
-    if mode == "interactive":
+    if mode == "interactive" or mode == "i":
         menu()
-    elif mode == "encrypt" or mode == "decrypt":
+    elif mode == "encrypt" or mode == "e" or mode == "decrypt" or mode == "d":
         if fileName != "":
             file = open(fileName, "r") # Open file in read mode
             decrypted = file.read() # Read file contents to string
