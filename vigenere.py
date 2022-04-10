@@ -42,23 +42,27 @@ def main(): # Welcome message and run menu
             file.close() # Close file
             if mode == "encrypt":
                 if key != "":
-                    encrypt(decrypted,key,f"{fileName}.out") # Encrypt string `decrypted` with key `key` into file `[filename].out`
+                    print("--- START ENCRYPTION ---")
+                    encrypted = encrypt(decrypted,key) # Encrypt string `decrypted` with key `key`
+                    file = open(fileName, "w") # Open file in write mode
+                    file.write(encrypted) # Write encrypted string to file contents
+                    file.close() # Close file
+                    print(f"--- OUTPUT to '{fileName}' ---")
+                    print("--- FINISH ENCRYPTION ---")
                 else:
                     errorMessage("Key not specified!")
             elif mode == "decrypt":
-                decrypt(encrypted,f"{fileName}.out")
+                print("--- START DECRYPTION ---")
+                    # TODO: Get all possible decryptions
+                    # TODO: Test for chi squared test (Frequency similarities)
+                    # TODO: Output lowest error value
+                print("--- FINISH DECRYPTION ---")
         else:
             errorMessage("File not specified!")
     else:
         errorMessage("Invalid mode specified!")
 
-def encrypt(decrypted, key, output=""): # Encrypt string (OPTIONAL output filename param, outputs to CLI if empty)
-    print("--- START ENCRYPTION ---")
-
-    if output == "":
-        print(f"Decrypted: {decrypted}")
-        print(f"Key: {key}")
-    
+def encrypt(decrypted, key): # Encrypt string    
     key = key.upper()
     lowerStart = ord('a') # Start shift for 'a' in lowercase
     upperStart = ord('A') # Start shift for 'A' in uppercase
@@ -80,34 +84,10 @@ def encrypt(decrypted, key, output=""): # Encrypt string (OPTIONAL output filena
             i += 1
         else: # If not alphanumeric
             encrypted += c
+    return encrypted
 
-    if output == "":
-        print(f"Encrypted: {encrypted}")
-    else:
-        print(f"--- OUTPUT at '{output}' ---")
-        file = open(output, "w") # Open file in write mode
-        file.write(encrypted) # Write encrypted string to file contents
-        file.close() # Close file
-
-    print("--- FINISH ENCRYPTION ---")
-
-def decrypt(encrypted, output=""): # Decrypt string (OPTIONAL output filename param, outputs to CLI if empty)
-    print("--- START DECRYPTION ---")
-
-    if output == "":
-        print(f"Encrypted: {encrypted}")
-
-    decrypted = encrypted # Do work
-
-    if output == "":
-        print(f"Decrypted: {decrypted}")
-    else:
-        print(f"--- OUTPUT at '{output}' ---")
-        file = open(output, "w") # Open file in write mode
-        file.write(decrypted) # Write decrypted string to file contents
-        file.close() # Close file
-
-    print("--- FINISH DECRYPTION ---")
+def decrypt(encrypted, key): # Decrypt string
+    # Do work
 
 def errorMessage(message): # Print param 'message' formatted as ERROR
     print("--- ERROR ---")
@@ -129,10 +109,16 @@ def menu(): # Menu Options
         if option == 1: # Encrypt
             decrypted = input("Enter message: ")
             key = input("Enter key: ")
-            encrypt(decrypted,key)
+            print("--- START ENCRYPTION ---")
+            print(f"Encrypted: {encrypt(decrypted,key)}") # Output encrypted value
+            print("--- FINISH ENCRYPTION ---")
         elif option == 2: # Decrypt
             encrypted = input("Enter message: ")
-            decrypt(encrypted)
+            print("--- START DECRYPTION ---")
+                # TODO: Get all possible decryptions
+                # TODO: Test for chi squared test (Frequency similarities)
+                # TODO: Output lowest error value
+            print("--- FINISH DECRYPTION ---")
         elif option == 3: # Exit
             print("--- GOODBYE ---")
             menuLoop = False
