@@ -66,7 +66,7 @@ def encrypt(decrypted, key): # Encrypt string with given key
     # Encrypts using iterated-key method, where for each character in string, 
     # character is encrypted by nth character in string (modulo key length. 
     # This simulates a key of same length as string, but is more memory efficient)
-    
+
     key = key.upper()
     lowerStart = ord('a') # Start shift for 'a' in lowercase
     upperStart = ord('A') # Start shift for 'A' in uppercase
@@ -91,8 +91,32 @@ def encrypt(decrypted, key): # Encrypt string with given key
     return encrypted
 
 def decrypt(encrypted, key): # Decrypt string with given key
-    # TODO: Do work
-    print("DECRYPTING...") # Placeholder
+    # Decrypts using iterated-key method, where for each character in string, 
+    # character is decrypted by nth character in string (modulo key length. 
+    # This simulates a key of same length as string, but is more memory efficient)
+    
+    key = key.upper()
+    lowerStart = ord('a') # Start shift for 'a' in lowercase
+    upperStart = ord('A') # Start shift for 'A' in uppercase
+    decrypted = ""
+
+    i = 0
+    for c in encrypted:
+        if c.isalpha():
+            if c.isupper(): # Uppercase shift
+                start = upperStart
+            else: # Lowercase shift
+                start = lowerStart
+
+            cPos = ord(c) - start # Get position of char
+            shift = ord(key[i % len(key)]) - upperStart # Get reverseshift amount based on keyPos (Key is in uppercase)
+            cNewPos = (cPos - shift) % 26 # Get position of shifted char
+            
+            decrypted += chr(cNewPos + start) # Add character to decrypted string
+            i += 1
+        else: # If not alphanumeric
+            decrypted += c
+    return decrypted
 
 def errorMessage(message): # Print param 'message' formatted as ERROR
     print("--- ERROR ---")
