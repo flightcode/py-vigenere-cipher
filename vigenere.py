@@ -47,11 +47,35 @@ def main(): # Welcome message and run menu
 
 def encrypt(decrypted, key, output=""): # Encrypt string (OPTIONAL output filename param, outputs to CLI if empty)
     print("--- START ENCRYPTION ---")
+
     if output == "":
         print(f"Decrypted: {decrypted}")
         print(f"Key: {key}")
     
-    encrypted = decrypted # Do work
+    key = key.upper()
+    keyPos = 0 # Current position of key to use in shift
+    lowerStart = ord('a') # Start shift for 'a' in lowercase
+    upperStart = ord('A') # Start shift for 'A' in uppercase
+    encrypted = ""
+
+    for c in decrypted:
+        if c.isalpha():
+            if c.isupper(): # Uppercase shift
+                start = upperStart
+            else: # Lowercase shift
+                start = lowerStart
+
+            cPos = ord(c) - start # Get position of char
+            shift = ord(key[keyPos]) - upperStart # Get shift amount based on keyPos (Key is in uppercase)
+            cNewPos = start + (cPos + shift) % 26 # Get position of shifted char
+
+            keyPos += 1
+            if keyPos >= len(key): # Completed full cycle of key length 
+                keyPos = 0
+            
+            encrypted += chr(cNewPos) # Add character to encrypted string
+        else: # If not alphanumeric
+            encrypted += c
 
     if output == "":
         print(f"Encrypted: {encrypted}")
@@ -60,10 +84,12 @@ def encrypt(decrypted, key, output=""): # Encrypt string (OPTIONAL output filena
         file = open(output, "w") # Open file in write mode
         file.write(encrypted) # Write encrypted string to file contents
         file.close() # Close file
+
     print("--- FINISH ENCRYPTION ---")
 
 def decrypt(encrypted, output=""): # Decrypt string (OPTIONAL output filename param, outputs to CLI if empty)
     print("--- START DECRYPTION ---")
+
     if output == "":
         print(f"Encrypted: {encrypted}")
 
@@ -76,6 +102,7 @@ def decrypt(encrypted, output=""): # Decrypt string (OPTIONAL output filename pa
         file = open(output, "w") # Open file in write mode
         file.write(decrypted) # Write decrypted string to file contents
         file.close() # Close file
+
     print("--- FINISH DECRYPTION ---")
 
 def errorMessage(message): # Print param 'message' formatted as ERROR
