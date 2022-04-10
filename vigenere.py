@@ -87,7 +87,8 @@ def encrypt(decrypted, key): # Encrypt string
     return encrypted
 
 def decrypt(encrypted, key): # Decrypt string
-    # Do work
+    # TODO: Do work
+    print("DECRYPTING...") # Placeholder
 
 def errorMessage(message): # Print param 'message' formatted as ERROR
     print("--- ERROR ---")
