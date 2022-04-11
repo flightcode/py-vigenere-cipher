@@ -122,40 +122,70 @@ def decrypt(encrypted, key): # Decrypt string with given key
     return decrypted
 
 def solve(encrypted): # Decrypt string without key, returning best match
-    bestShifts = []
-    for l in range(1,len(encrypted)): # Try all possible key lengths
-        print(f"Trying key length {l}...")
-        keys = itertools.product(string.ascii_uppercase, repeat = l) # Get all possible key combinations of length `l`
-        shifts = []
-        for k in keys: # Try all possible keys of length `l`
-            key = "".join(k)
-            decrypted = decrypt(encrypted, key) # Get decrypted string from possible key
-            accuracy = freqTest(decrypted) # Get accuracy of decrypted string
-            shifts.append((accuracy, key)) # Add possible shift to array
-        bestShifts.append(min(shifts, key=lambda x: x[0])) # Add best key combination from this key length to `bestShifts` (Sorted by `accuracy` value of tuple)
-        print(f"Best key at length {l} = {min(shifts, key=lambda x: x[0])}")
-    bestKey = min(bestShifts, key=lambda x: x[0]) # Return most accurate key from `bestShifts` at all key lengths
-    print(f"Best key overall = {bestKey[1]}")
+    # Initially used itertools.product to get all possible key combinations 
+    # of length `l` (from 1 to length of message). However after research,
+    # I discovered that by decrypting every nth letter (based on key length),
+    # and then testing the frequency, I could run tests much quicker, as a
+    # smaller dataset was being used, not repeating over the same char in the
+    # same index.
+    #
+    # This reduced complexity from O(26^key_length) to O(26*key_length).
+
+    encryptedTrimmed = [c for c in encrypted.upper() if c in string.ascii_uppercase]
+    keys = []
+    for l in range(len(encrypted)): # Try all possible key lengths
+        l += 1
+        keyAccuracy = 0
+        key = ""
+        for i in range(l): # Iterate through nth letter of key length
+            affectedLetters = "".join(itertools.islice(encryptedTrimmed, i, None, l)) # Get every nth letter from `encrypted`
+            shifts = []
+            for c in string.ascii_uppercase: # Try all possible characters for nth letter
+                decrypted = decrypt(affectedLetters, c) # Get decrypted string from possible key
+                accuracy = freqTest(decrypted) # Get accuracy of decrypted string
+                shifts.append((accuracy, c)) # Add possible shift to array
+            bestChar = min(shifts, key=lambda x: x[0])
+            keyAccuracy += bestChar[0]
+            key += bestChar[1]
+        keys.append((keyAccuracy,key))
+        # print(f"Best key at length {l} = {(keyAccuracy,key)}") # DEBUGGING
+       
+        # OLD USING itertools.product
+        #
+        # print(f"Trying key length {l}...")
+        # keys = itertools.product(string.ascii_uppercase, repeat = l) # Get all possible key combinations of length `l`
+        # shifts = []
+        # for k in keys: # Try all possible keys of length `l`
+        #     key = "".join(k)
+        #     decrypted = decrypt(encrypted, key) # Get decrypted string from possible key
+        #     accuracy = freqTest(decrypted) # Get accuracy of decrypted string
+        #     shifts.append((accuracy, key)) # Add possible shift to array
+        # bestShifts.append(min(shifts, key=lambda x: x[0])) # Add best key combination from this key length to `bestShifts` (Sorted by `accuracy` value of tuple)
+        # print(f"Best key at length {l} = {min(shifts, key=lambda x: x[0])}")
+
+    bestKey = min(keys, key=lambda x: x[0]) # Return most accurate key from `bestKeys` at all key lengths
+    # print(f"Best key overall = {bestKey}") # DEBUGGING
     return decrypt(encrypted, bestKey[1]) # Return decryption using `bestKey`
 
 def freqTest(message): # Test frequency of string against English language alphabet frequencies (0 is most accurate)
     ENGLISH_FREQ = { # Frequencies of characters in English language
-        "a": 0.08497, "b": 0.01492, "c": 0.02202, "d": 0.04253, "e": 0.11162, "f": 0.02228,
-        "g": 0.02015, "h": 0.06094, "i": 0.07546, "j": 0.00153, "k": 0.01292, "l": 0.04025,
-        "m": 0.02406, "n": 0.06749, "o": 0.07507, "p": 0.01929, "q": 0.00095, "r": 0.07587,
-        "s": 0.06327, "t": 0.09356, "u": 0.02758, "v": 0.00978, "w": 0.02560, "x": 0.00150,
-        "y": 0.01994, "z": 0.00077,
+        "A": 0.08497, "B": 0.01492, "C": 0.02202, "D": 0.04253, "E": 0.11162, "F": 0.02228,
+        "G": 0.02015, "H": 0.06094, "I": 0.07546, "J": 0.00153, "K": 0.01292, "L": 0.04025,
+        "M": 0.02406, "N": 0.06749, "O": 0.07507, "P": 0.01929, "Q": 0.00095, "R": 0.07587,
+        "S": 0.06327, "T": 0.09356, "U": 0.02758, "V": 0.00978, "W": 0.02560, "X": 0.00150,
+        "Y": 0.01994, "Z": 0.00077,
     }
     testStatistic = 0.0
     for c in ENGLISH_FREQ: # Iterate through all characters
-        freq = message.count(c) / len(message) # Get occurrence of character in shift
+        if c in message:
+            freq = message.count(c) / len(message) # Get occurrence of character in shift
 
-        # ALTERNATE CALCULATION USING BASIC VARIANCE FROM EXPECTED
-        # letterVariance = abs(freq - ENGLISH_FREQ[c]) # Get variance from expected frequency
-        # variance += letterVariance # Add to total variance
+            # ALTERNATE CALCULATION USING BASIC VARIANCE FROM EXPECTED
+            # letterVariance = abs(freq - ENGLISH_FREQ[c]) # Get variance from expected frequency
+            # variance += letterVariance # Add to total variance
 
-        letterTestStatistic = ((freq - ENGLISH_FREQ[c]) ** 2) / ENGLISH_FREQ[c] #Get test statistic
-        testStatistic += letterTestStatistic #Add test statistic to total
+            letterTestStatistic = ((freq - ENGLISH_FREQ[c]) ** 2) / ENGLISH_FREQ[c] #Get test statistic
+            testStatistic += letterTestStatistic #Add test statistic to total
     return testStatistic
 
 def errorMessage(message): # Print param 'message' formatted as ERROR
