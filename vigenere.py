@@ -123,8 +123,7 @@ def decrypt(encrypted, key): # Decrypt string with given key
 
 def solve(encrypted): # Decrypt string without key, returning best match
     bestShifts = []
-    for l in range(len(encrypted)): # Try all possible key lengths
-        l += 1
+    for l in range(1,len(encrypted)): # Try all possible key lengths
         print(f"Trying key length {l}...")
         keys = itertools.product(string.ascii_uppercase, repeat = l) # Get all possible key combinations of length `l`
         shifts = []
