@@ -139,7 +139,7 @@ def solve(encrypted): # Decrypt string without key, returning best match
     return decrypt(encrypted, bestKey[1]) # Return decryption using `bestKey`
 
 def freqTest(message): # Test frequency of string against English language alphabet frequencies (0 is most accurate)
-    FREQUENCIES = { #Frequencies of characters in English language
+    ENGLISH_FREQ = { # Frequencies of characters in English language
         "a": 0.08497, "b": 0.01492, "c": 0.02202, "d": 0.04253, "e": 0.11162, "f": 0.02228,
         "g": 0.02015, "h": 0.06094, "i": 0.07546, "j": 0.00153, "k": 0.01292, "l": 0.04025,
         "m": 0.02406, "n": 0.06749, "o": 0.07507, "p": 0.01929, "q": 0.00095, "r": 0.07587,
@@ -147,12 +147,15 @@ def freqTest(message): # Test frequency of string against English language alpha
         "y": 0.01994, "z": 0.00077,
     }
     testStatistic = 0.0
-    for c in message: #Iterate through all characters in shift
-        if c in FREQUENCIES:
-            occ = message.count(c) #Get occurrence of characters in shift
-            occ_expected = FREQUENCIES[c] * occ #Get expected occurrence from frequencies
-            letterTestStatistic = ((occ - occ_expected) ** 2) / occ_expected #Get test statistic
-            testStatistic += letterTestStatistic #Add test statistic to total
+    for c in ENGLISH_FREQ: # Iterate through all characters
+        freq = message.count(c) / len(message) # Get occurrence of character in shift
+
+        # ALTERNATE CALCULATION USING BASIC VARIANCE FROM EXPECTED
+        # letterVariance = abs(freq - ENGLISH_FREQ[c]) # Get variance from expected frequency
+        # variance += letterVariance # Add to total variance
+
+        letterTestStatistic = ((freq - ENGLISH_FREQ[c]) ** 2) / ENGLISH_FREQ[c] #Get test statistic
+        testStatistic += letterTestStatistic #Add test statistic to total
     return testStatistic
 
 def errorMessage(message): # Print param 'message' formatted as ERROR
