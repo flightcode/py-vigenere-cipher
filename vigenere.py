@@ -169,7 +169,10 @@ def solve(encrypted): # Decrypt string without key, returning best match
     # print(f"Best key overall = {bestKey}") # DEBUGGING
     return bestKey[1] # Return `bestKey`
 
-def freqTest(message): # Test frequency of string against English language alphabet frequencies (0 is most accurate)
+def freqTest(message): # Test frequency of string against English language alphabet frequencies using Chi-Squared Test (0 is most accurate)
+    # I tried using a basic variance from expected measure here, but found it didn't provide as good values
+    # as using the Chi-Squared test.
+    
     ENGLISH_FREQ = { # Frequencies of characters in English language
         "A": 0.08497, "B": 0.01492, "C": 0.02202, "D": 0.04253, "E": 0.11162, "F": 0.02228,
         "G": 0.02015, "H": 0.06094, "I": 0.07546, "J": 0.00153, "K": 0.01292, "L": 0.04025,
@@ -181,7 +184,6 @@ def freqTest(message): # Test frequency of string against English language alpha
     for c in ENGLISH_FREQ: # Iterate through all characters
         if c in message:
             freq = message.count(c) / len(message) # Get occurrence of character in shift
-
             letterTestStatistic = ((freq - ENGLISH_FREQ[c]) ** 2) / ENGLISH_FREQ[c] #Get test statistic
             testStatistic += letterTestStatistic #Add test statistic to total
     return testStatistic
