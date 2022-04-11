@@ -55,7 +55,9 @@ def main(): # Welcome message and run menu
                     return errorMessage("Key not specified!")
             elif mode == "decrypt" or mode == "d":
                 print("--- START DECRYPTION ---")
-                decrypted = solve(text) # Decrypt string recursively, finding correct key
+                key = solve(text) # Find correct key
+                print("--- KEY SOLVED ---")
+                decrypted = decrypt(text, key)
                 file = open(f"{fileName}.out", "w") # Open file in write mode
                 file.write(decrypted) # Write decrypted string to file contents
                 file.close() # Close file
@@ -165,7 +167,7 @@ def solve(encrypted): # Decrypt string without key, returning best match
 
     bestKey = min(keys, key=lambda x: x[0]) # Return most accurate key from `bestKeys` at all key lengths
     # print(f"Best key overall = {bestKey}") # DEBUGGING
-    return decrypt(encrypted, bestKey[1]) # Return decryption using `bestKey`
+    return bestKey[1] # Return `bestKey`
 
 def freqTest(message): # Test frequency of string against English language alphabet frequencies (0 is most accurate)
     ENGLISH_FREQ = { # Frequencies of characters in English language
@@ -217,7 +219,11 @@ def menu(): # Menu Options
         elif option == 2: # Decrypt
             encrypted = input("Enter message: ")
             print("--- START DECRYPTION ---")
-            print(f"Decrypted: {solve(encrypted)}") # Decrypt string recursively, finding correct key
+            key = solve(encrypted) # Find correct key
+            print("--- KEY SOLVED ---")
+            print(f"Key: {solve(encrypted)}") # Decrypt string recursively, finding correct key
+            decrypted = decrypt(encrypted, key)
+            print(f"Decrypted: {decrypt(encrypted,key)}") # Decrypt string recursively, finding correct key
             print("--- FINISH DECRYPTION ---")
         elif option == 3: # Exit
             print("--- GOODBYE ---")
