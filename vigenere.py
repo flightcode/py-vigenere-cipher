@@ -1,4 +1,4 @@
-#!/usr/local/opt/python@3.10/bin/python3
+#!/usr/bin/env python3
 
 # Vigenere cipher encoder/decoder.
 # github.com/flightcode
