@@ -147,7 +147,7 @@ def solve(encrypted): # Decrypt string without key, returning best match
                 accuracy = freqTest(decrypted) # Get accuracy of decrypted string
                 shifts.append((accuracy, c)) # Add possible shift to array
             bestChar = min(shifts, key=lambda x: x[0])
-            keyAccuracy += bestChar[0]
+            keyAccuracy += (bestChar[0] / l) # Add char accuracy to key accuracy, divide by key_length avoids biasing for smaller keys
             key += bestChar[1]
         keys.append((keyAccuracy,key))
         # print(f"Best key at length {l} = {(keyAccuracy,key)}") # DEBUGGING
@@ -181,10 +181,6 @@ def freqTest(message): # Test frequency of string against English language alpha
     for c in ENGLISH_FREQ: # Iterate through all characters
         if c in message:
             freq = message.count(c) / len(message) # Get occurrence of character in shift
-
-            # ALTERNATE CALCULATION USING BASIC VARIANCE FROM EXPECTED
-            # letterVariance = abs(freq - ENGLISH_FREQ[c]) # Get variance from expected frequency
-            # variance += letterVariance # Add to total variance
 
             letterTestStatistic = ((freq - ENGLISH_FREQ[c]) ** 2) / ENGLISH_FREQ[c] #Get test statistic
             testStatistic += letterTestStatistic #Add test statistic to total
