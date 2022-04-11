@@ -123,7 +123,7 @@ def decrypt(encrypted, key): # Decrypt string with given key
             decrypted += c
     return decrypted
 
-def solve(encrypted): # Decrypt string without key, returning best match
+def solve(encrypted): # Get key of encrypted string
     # Initially used itertools.product to get all possible key combinations 
     # of length `l` (from 1 to length of message). However after research,
     # I discovered that by decrypting every nth letter (based on key length),
