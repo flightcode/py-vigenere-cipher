@@ -11,6 +11,8 @@
 
 import sys # For CLI rguments
 import getopt # Parses CLI arguments
+import itertools # Code-efficient iterators
+import string
 
 def main(): # Welcome message and run menu
     print("--- VIGENERE CIPHER ----")
@@ -38,24 +40,25 @@ def main(): # Welcome message and run menu
     elif mode == "encrypt" or mode == "e" or mode == "decrypt" or mode == "d":
         if fileName != "":
             file = open(fileName, "r") # Open file in read mode
-            decrypted = file.read() # Read file contents to string
+            text = file.read() # Read file contents to string
             file.close() # Close file
-            if mode == "encrypt":
+            if mode == "encrypt" or mode == "e":
                 if key != "":
                     print("--- START ENCRYPTION ---")
-                    encrypted = encrypt(decrypted,key) # Encrypt string `decrypted` with key `key`
-                    file = open(fileName, "w") # Open file in write mode
+                    encrypted = encrypt(text,key) # Encrypt string `decrypted` with key `key`
+                    file = open(f"{fileName}.out", "w") # Open file in write mode
                     file.write(encrypted) # Write encrypted string to file contents
                     file.close() # Close file
-                    print(f"--- OUTPUT to '{fileName}' ---")
+                    print(f"--- OUTPUT to '{fileName}.out' ---")
                     print("--- FINISH ENCRYPTION ---")
                 else:
                     return errorMessage("Key not specified!")
-            elif mode == "decrypt":
+            elif mode == "decrypt" or mode == "d":
                 print("--- START DECRYPTION ---")
-                    # TODO: Get all possible decryptions
-                    # TODO: Test for chi squared test (Frequency similarities)
-                    # TODO: Output lowest error value
+                decrypted = solve(text) # Decrypt string recursively, finding correct key
+                file = open(f"{fileName}.out", "w") # Open file in write mode
+                file.write(decrypted) # Write decrypted string to file contents
+                file.close() # Close file
                 print("--- FINISH DECRYPTION ---")
         else:
             return errorMessage("File not specified!")
@@ -118,6 +121,41 @@ def decrypt(encrypted, key): # Decrypt string with given key
             decrypted += c
     return decrypted
 
+def solve(encrypted): # Decrypt string without key, returning best match
+    bestShifts = []
+    for l in range(len(encrypted)): # Try all possible key lengths
+        l += 1
+        print(f"Trying key length {l}...")
+        keys = itertools.product(string.ascii_uppercase, repeat = l) # Get all possible key combinations of length `l`
+        shifts = []
+        for k in keys: # Try all possible keys of length `l`
+            key = "".join(k)
+            decrypted = decrypt(encrypted, key) # Get decrypted string from possible key
+            accuracy = freqTest(decrypted) # Get accuracy of decrypted string
+            shifts.append((accuracy, key)) # Add possible shift to array
+        bestShifts.append(min(shifts, key=lambda x: x[0])) # Add best key combination from this key length to `bestShifts` (Sorted by `accuracy` value of tuple)
+        print(f"Best key at length {l} = {min(shifts, key=lambda x: x[0])}")
+    bestKey = min(bestShifts, key=lambda x: x[0]) # Return most accurate key from `bestShifts` at all key lengths
+    print(f"Best key overall = {bestKey[1]}")
+    return decrypt(encrypted, bestKey[1]) # Return decryption using `bestKey`
+
+def freqTest(message): # Test frequency of string against English language alphabet frequencies (0 is most accurate)
+    FREQUENCIES = { #Frequencies of characters in English language
+        "a": 0.08497, "b": 0.01492, "c": 0.02202, "d": 0.04253, "e": 0.11162, "f": 0.02228,
+        "g": 0.02015, "h": 0.06094, "i": 0.07546, "j": 0.00153, "k": 0.01292, "l": 0.04025,
+        "m": 0.02406, "n": 0.06749, "o": 0.07507, "p": 0.01929, "q": 0.00095, "r": 0.07587,
+        "s": 0.06327, "t": 0.09356, "u": 0.02758, "v": 0.00978, "w": 0.02560, "x": 0.00150,
+        "y": 0.01994, "z": 0.00077,
+    }
+    testStatistic = 0.0
+    for c in message: #Iterate through all characters in shift
+        if c in FREQUENCIES:
+            occ = message.count(c) #Get occurrence of characters in shift
+            occ_expected = FREQUENCIES[c] * occ #Get expected occurrence from frequencies
+            letterTestStatistic = ((occ - occ_expected) ** 2) / occ_expected #Get test statistic
+            testStatistic += letterTestStatistic #Add test statistic to total
+    return testStatistic
+
 def errorMessage(message): # Print param 'message' formatted as ERROR
     print("--- ERROR ---")
     print(f"{message}")
@@ -147,9 +185,7 @@ def menu(): # Menu Options
         elif option == 2: # Decrypt
             encrypted = input("Enter message: ")
             print("--- START DECRYPTION ---")
-                # TODO: Get all possible decryptions
-                # TODO: Test for chi squared test (Frequency similarities)
-                # TODO: Output lowest error value
+            print(f"Decrypted: {solve(encrypted)}") # Decrypt string recursively, finding correct key
             print("--- FINISH DECRYPTION ---")
         elif option == 3: # Exit
             print("--- GOODBYE ---")
