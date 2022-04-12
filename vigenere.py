@@ -58,9 +58,9 @@ def main(): # Welcome message and run menu
             if mode == "encrypt" or mode == "e":
                 if key != "":
                     print("--- START ENCRYPTION ---")
-                    encrypted = encrypt(text,key) # Encrypt string `decrypted` with key `key`
+                    ciphertext = encrypt(text,key) # Encrypt string `decrypted` with key `key`
                     file = open(f"{fileName}.out", "w") # Open file in write mode
-                    file.write(encrypted) # Write encrypted string to file contents
+                    file.write(ciphertext) # Write encrypted string to file contents
                     file.close() # Close file
                     print(f"--- OUTPUT to '{fileName}.out' ---")
                     print("--- FINISH ENCRYPTION ---")
@@ -69,9 +69,9 @@ def main(): # Welcome message and run menu
             elif mode == "decrypt" or mode == "d":
                 if key != "":
                     print("--- START DECRYPTION ---")
-                    decrypted = decrypt(text, key)
+                    plaintext = decrypt(text, key)
                     file = open(f"{fileName}.out", "w") # Open file in write mode
-                    file.write(decrypted) # Write decrypted string to file contents
+                    file.write(plaintext) # Write decrypted string to file contents
                     file.close() # Close file
                     print("--- FINISH DECRYPTION ---")
                 else:
@@ -80,9 +80,9 @@ def main(): # Welcome message and run menu
                 print("--- START DECRYPTION ---")
                 key = solve(text) # Find correct key
                 print("--- KEY SOLVED ---")
-                decrypted = decrypt(text, key)
+                plaintext = decrypt(text, key)
                 file = open(f"{fileName}.out", "w") # Open file in write mode
-                file.write(decrypted) # Write decrypted string to file contents
+                file.write(plaintext) # Write decrypted string to file contents
                 file.close() # Close file
                 print("--- FINISH DECRYPTION ---")
         else:
@@ -90,7 +90,7 @@ def main(): # Welcome message and run menu
     else:
         return errorMessage("Invalid mode specified!")
 
-def encrypt(decrypted, key): # Encrypt string with given key    
+def encrypt(plaintext, key): # Encrypt string with given key    
     # Encrypts using iterated-key method, where for each character in string, 
     # character is encrypted by nth character in string (modulo key length. 
     # This simulates a key of same length as string, but is more memory efficient)
@@ -98,10 +98,10 @@ def encrypt(decrypted, key): # Encrypt string with given key
     key = key.upper()
     lowerStart = ord('a') # Start shift for 'a' in lowercase
     upperStart = ord('A') # Start shift for 'A' in uppercase
-    encrypted = ""
+    ciphertext = ""
 
     i = 0
-    for c in decrypted:
+    for c in plaintext:
         if c.isalpha():
             if c.isupper(): # Uppercase shift
                 start = upperStart
@@ -112,13 +112,13 @@ def encrypt(decrypted, key): # Encrypt string with given key
             shift = ord(key[i % len(key)]) - upperStart # Get shift amount based on keyPos (Key is in uppercase)
             cNewPos = (cPos + shift) % 26 # Get position of shifted char
             
-            encrypted += chr(cNewPos + start) # Add character to encrypted string
+            ciphertext += chr(cNewPos + start) # Add character to encrypted string
             i += 1
         else: # If not alphanumeric
-            encrypted += c
-    return encrypted
+            ciphertext += c
+    return ciphertext
 
-def decrypt(encrypted, key): # Decrypt string with given key
+def decrypt(ciphertext, key): # Decrypt string with given key
     # Decrypts using iterated-key method, where for each character in string, 
     # character is decrypted by nth character in string (modulo key length. 
     # This simulates a key of same length as string, but is more memory efficient)
@@ -126,10 +126,10 @@ def decrypt(encrypted, key): # Decrypt string with given key
     key = key.upper()
     lowerStart = ord('a') # Start shift for 'a' in lowercase
     upperStart = ord('A') # Start shift for 'A' in uppercase
-    decrypted = ""
+    plaintext = ""
 
     i = 0
-    for c in encrypted:
+    for c in ciphertext:
         if c.isalpha():
             if c.isupper(): # Uppercase shift
                 start = upperStart
@@ -140,13 +140,13 @@ def decrypt(encrypted, key): # Decrypt string with given key
             shift = ord(key[i % len(key)]) - upperStart # Get reverseshift amount based on keyPos (Key is in uppercase)
             cNewPos = (cPos - shift) % 26 # Get position of shifted char
             
-            decrypted += chr(cNewPos + start) # Add character to decrypted string
+            plaintext += chr(cNewPos + start) # Add character to decrypted string
             i += 1
         else: # If not alphanumeric
-            decrypted += c
-    return decrypted
+            plaintext += c
+    return plaintext
 
-def solve(encrypted): # Get key of encrypted string
+def solve(ciphertext): # Get key of encrypted string
     # Initially used itertools.product to get all possible key combinations 
     # of length `l` (from 1 to length of message). However after research,
     # I discovered that by decrypting every nth letter (based on key length),
@@ -156,18 +156,18 @@ def solve(encrypted): # Get key of encrypted string
     #
     # This reduced complexity from O(26^key_length) to O(26*key_length).
 
-    encryptedTrimmed = [c for c in encrypted.upper() if c in string.ascii_uppercase]
+    ciphertextTrimmed = [c for c in ciphertext.upper() if c in string.ascii_uppercase]
     keys = []
-    for l in range(len(encrypted)): # Try all possible key lengths
+    for l in range(len(ciphertext)): # Try all possible key lengths
         l += 1
         keyAccuracy = 0
         key = ""
         for i in range(l): # Iterate through nth letter of key length
-            affectedLetters = "".join(itertools.islice(encryptedTrimmed, i, None, l)) # Get every nth letter from `encrypted`
+            affectedLetters = "".join(itertools.islice(ciphertextTrimmed, i, None, l)) # Get every nth letter from `encrypted`
             shifts = []
             for c in string.ascii_uppercase: # Try all possible characters for nth letter
-                decrypted = decrypt(affectedLetters, c) # Get decrypted string from possible key
-                accuracy = freqTest(decrypted) # Get accuracy of decrypted string
+                plaintext = decrypt(affectedLetters, c) # Get decrypted string from possible key
+                accuracy = freqTest(plaintext) # Get accuracy of decrypted string
                 shifts.append((accuracy, c)) # Add possible shift to array
             bestChar = min(shifts, key=lambda x: x[0])
             keyAccuracy += (bestChar[0] / l) # Add char accuracy to key accuracy, divide by key_length avoids biasing for smaller keys
@@ -230,29 +230,27 @@ def menu(): # Menu Options
         option = int(input("Enter option: ")) # Get input as int
         print("")
         if option == 1: # Encrypt
-            decrypted = input("Enter message: ")
+            plaintext = input("Enter message: ")
             key = input("Enter key: ")
             if key != "":
                 print("--- START ENCRYPTION ---")
-                print(f"Encrypted: {encrypt(decrypted,key)}") # Output encrypted value
+                print(f"Encrypted: {encrypt(plaintext,key)}") # Output encrypted value
                 print("--- FINISH ENCRYPTION ---")
             else:
                 return errorMessage("Key not specified!")
         elif option == 2: # Decrypt
-            encrypted = input("Enter message: ")
+            ciphertext = input("Enter message: ")
             key = input("Enter key: ")
             print("--- START DECRYPTION ---")
-            decrypted = decrypt(encrypted, key)
-            print(f"Decrypted: {decrypt(encrypted,key)}") # Output decrypted value
+            print(f"Decrypted: {decrypt(ciphertext,key)}") # Output decrypted value
             print("--- FINISH DECRYPTION ---")
         elif option == 3: # Solve (Decrypt without Key)
-            encrypted = input("Enter message: ")
+            ciphertext = input("Enter message: ")
             print("--- START DECRYPTION ---")
-            key = solve(encrypted) # Find correct key
+            key = solve(ciphertext) # Find correct key
             print("--- KEY SOLVED ---")
             print(f"Key: {key}") # Decrypt string recursively, finding correct key
-            decrypted = decrypt(encrypted, key)
-            print(f"Decrypted: {decrypt(encrypted,key)}") # Decrypt string with correct key
+            print(f"Decrypted: {decrypt(ciphertext,key)}") # Decrypt string with correct key
             print("--- FINISH DECRYPTION ---")
         elif option == 4: # Exit
             print("--- GOODBYE ---")
