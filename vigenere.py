@@ -18,21 +18,34 @@ def main(): # Welcome message and run menu
     print("--- VIGENERE CIPHER ----")
     print("--- FLIGHTCODE 2022 ----")
 
+    mode = "" # Interactive for testing or if user wants a menu
     fileName = "" # File to parse
-    mode = "" # Mode (interactive is for testing or if user wants a menu)
-    key = "" # If applicable, if not provided for decode, will attempt to crack. Required for encode.
+    key = "" # Required for encode.
 
     try: # Attempt to parse arguments (Strip first argument (Command))
-        opts, args = getopt.getopt(sys.argv[1:], "m:f:k:")
+        opts, args = getopt.getopt(sys.argv[1:], "hm:f:k:", ["help","mode=","file=","key="])
     except:
         errorMessage("Unable to parse arguments!")
+        print('Usage: ./vigenere.py -m <mode> -f <file> -k <key>')
+        print('Modes: e|encrypt')
+        print('       d|decrypt')
+        print('       s|solve')
+        print('       i|interactive')
+        exit()
 
     for opt, arg in opts: # Assign from arguments 
-        if opt in ['-f']:
+        if opt in ["-h","--help"]:
+            print('Usage: ./vigenere.py -m <mode> -f <file> -k <key>')
+            print('Modes: e|encrypt')
+            print('       d|decrypt')
+            print('       s|solve')
+            print('       i|interactive')
+            exit()
+        elif opt in ["-f","--file"]:
             fileName = arg
-        elif opt in ['-m']:
+        elif opt in ["-m","--mode"]:
             mode = arg
-        elif opt in ['-k']:
+        elif opt in ["-k","--key"]:
             key = arg
 
     if mode == "interactive" or mode == "i":
