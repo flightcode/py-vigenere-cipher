@@ -5,7 +5,7 @@
 # 2022
 # USAGE: 
 #   python3 vigenere.py 
-#       -m (e|encrypt, d|decrypt, i|interactive) 
+#       -m (e|encrypt, d|decrypt, s|solve, i|interactive) 
 #       [-f <filename> (required if -m not i|interactive)]
 #       [-k <key> (required if -m e|encrypt)]
 
@@ -37,7 +37,7 @@ def main(): # Welcome message and run menu
 
     if mode == "interactive" or mode == "i":
         menu()
-    elif mode == "encrypt" or mode == "e" or mode == "decrypt" or mode == "d":
+    elif mode == "encrypt" or mode == "e" or mode == "decrypt" or mode == "d" or mode == "solve" or mode == "s":
         if fileName != "":
             file = open(fileName, "r") # Open file in read mode
             text = file.read() # Read file contents to string
@@ -54,6 +54,16 @@ def main(): # Welcome message and run menu
                 else:
                     return errorMessage("Key not specified!")
             elif mode == "decrypt" or mode == "d":
+                if key != "":
+                    print("--- START DECRYPTION ---")
+                    decrypted = decrypt(text, key)
+                    file = open(f"{fileName}.out", "w") # Open file in write mode
+                    file.write(decrypted) # Write decrypted string to file contents
+                    file.close() # Close file
+                    print("--- FINISH DECRYPTION ---")
+                else:
+                    return errorMessage("Key not specified!")
+            elif mode == "solve" or mode == "s":
                 print("--- START DECRYPTION ---")
                 key = solve(text) # Find correct key
                 print("--- KEY SOLVED ---")
@@ -200,7 +210,8 @@ def menu(): # Menu Options
         print("--- MENU ---")
         print("1. Encrypt")
         print("2. Decrypt")
-        print("3. Exit")
+        print("3. Solve (Decrypt without key)")
+        print("4. Exit")
         print("--- MENU ---")
         print("")
         option = int(input("Enter option: ")) # Get input as int
@@ -216,14 +227,21 @@ def menu(): # Menu Options
                 return errorMessage("Key not specified!")
         elif option == 2: # Decrypt
             encrypted = input("Enter message: ")
+            key = input("Enter key: ")
+            print("--- START DECRYPTION ---")
+            decrypted = decrypt(encrypted, key)
+            print(f"Decrypted: {decrypt(encrypted,key)}") # Output decrypted value
+            print("--- FINISH DECRYPTION ---")
+        elif option == 3: # Solve (Decrypt without Key)
+            encrypted = input("Enter message: ")
             print("--- START DECRYPTION ---")
             key = solve(encrypted) # Find correct key
             print("--- KEY SOLVED ---")
-            print(f"Key: {solve(encrypted)}") # Decrypt string recursively, finding correct key
+            print(f"Key: {key}") # Decrypt string recursively, finding correct key
             decrypted = decrypt(encrypted, key)
-            print(f"Decrypted: {decrypt(encrypted,key)}") # Decrypt string recursively, finding correct key
+            print(f"Decrypted: {decrypt(encrypted,key)}") # Decrypt string with correct key
             print("--- FINISH DECRYPTION ---")
-        elif option == 3: # Exit
+        elif option == 4: # Exit
             print("--- GOODBYE ---")
             menuLoop = False
         else:
