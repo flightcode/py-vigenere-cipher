@@ -143,15 +143,6 @@ def decrypt(ciphertext, key): # Decrypt string with given key
     return plaintext
 
 def solve(ciphertext): # Get key of encrypted string
-    # Initially used itertools.product to get all possible key combinations 
-    # of length `l` (from 1 to length of message). However after research,
-    # I discovered that by decrypting every nth letter (based on key length),
-    # and then testing the frequency, I could run tests much quicker, as a
-    # smaller dataset was being used, not repeating over the same char in the
-    # same index.
-    #
-    # This reduced complexity from O(26^key_length) to O(26*key_length).
-
     ciphertextTrimmed = [c for c in ciphertext.upper() if c in string.ascii_uppercase]
     keys = []
     for l in range(len(ciphertext)): # Try all possible key lengths
@@ -170,20 +161,6 @@ def solve(ciphertext): # Get key of encrypted string
             key += bestChar[1]
         keys.append((keyAccuracy,key))
         # print(f"Best key at length {l} = {(keyAccuracy,key)}") # DEBUGGING
-       
-        # OLD USING itertools.product
-        #
-        # print(f"Trying key length {l}...")
-        # keys = itertools.product(string.ascii_uppercase, repeat = l) # Get all possible key combinations of length `l`
-        # shifts = []
-        # for k in keys: # Try all possible keys of length `l`
-        #     key = "".join(k)
-        #     decrypted = decrypt(encrypted, key) # Get decrypted string from possible key
-        #     accuracy = freqTest(decrypted) # Get accuracy of decrypted string
-        #     shifts.append((accuracy, key)) # Add possible shift to array
-        # bestShifts.append(min(shifts, key=lambda x: x[0])) # Add best key combination from this key length to `bestShifts` (Sorted by `accuracy` value of tuple)
-        # print(f"Best key at length {l} = {min(shifts, key=lambda x: x[0])}")
-
     bestKey = min(keys, key=lambda x: x[0]) # Return most accurate key from `bestKeys` at all key lengths
     # print(f"Best key overall = {bestKey}") # DEBUGGING
     return bestKey[1] # Return `bestKey`
