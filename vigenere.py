@@ -143,17 +143,18 @@ def decrypt(ciphertext, key): # Decrypt string with given key
     return plaintext
 
 def solve(ciphertext): # Get key of encrypted string
-    ciphertextTrimmed = [c for c in ciphertext.upper() if c in string.ascii_uppercase]
+    ciphertextTrimmed = [c for c in ciphertext.upper() if c in string.ascii_uppercase] # Only test all alphabetical characters
+    # repeatedSequences = findRepeatedSequences(ciphertextTrimmed) # Attempt at Kasinski method.
     keys = []
     for l in range(len(ciphertext)): # Try all possible key lengths
         l += 1
         keyAccuracy = 0
         key = ""
         for i in range(l): # Iterate through nth letter of key length
-            affectedLetters = "".join(itertools.islice(ciphertextTrimmed, i, None, l)) # Get every nth letter from `encrypted`
+            subKeyLetters = "".join(itertools.islice(ciphertextTrimmed, i, None, l)) # Get every nth letter from `encrypted` based on key length and chosen index (subkey) of key
             shifts = []
             for c in string.ascii_uppercase: # Try all possible characters for nth letter
-                plaintext = decrypt(affectedLetters, c) # Get decrypted string from possible key
+                plaintext = decrypt(subKeyLetters, c) # Get decrypted string from possible key
                 accuracy = freqTest(plaintext) # Get accuracy of decrypted string
                 shifts.append((accuracy, c)) # Add possible shift to array
             bestChar = min(shifts, key=lambda x: x[0])
@@ -165,7 +166,25 @@ def solve(ciphertext): # Get key of encrypted string
     # print(f"Best key overall = {bestKey}") # DEBUGGING
     return bestKey[1] # Return `bestKey`
 
-def freqTest(message): # Test frequency of string against English language alphabet frequencies using Chi-Squared Test (0 is most accurate)
+def findRepeatedSequences(s): # Find all repeated sequences, including separation between these sequences
+    repeatedSeqs = {} # Create dict of all repeated sequences, and distance between each repitition
+    for l in range(3,6): # Test sequences of length 3-5
+        for seqStart in range (len(s)-l): # Iterate through all possible start positions for sequence length
+            seq = "".join(s[seqStart:seqStart+l]) # Get sequence from start (of length l)
+            if seq not in repeatedSeqs: # Add to `repeatedSeqs`
+                repeatedSeqs[seq] = 0 # Create blank spacings array for `seq`
+            repeatedSeqs[seq] += 1
+    repeatedSeqs = {seq:c for seq, c in repeatedSeqs.items() if c != 1} # Remove sequences with only 1 count
+    # seqSeparation = {}
+    # for seq, c in repeatedSeqs.items(): # Iterate through to get separation between repeated Sequences
+    #     for i in range(seqStart+l,len(s)-l): # Iterate through all possible start positions for other like sequences
+    #         if "".join(s[i:i+l]) == seq: # If like sequence found
+    #             if seq not in seqSeparation: # Add to `repeatedSeqs`
+    #                 seqSeparation[seq] = [] # Create blank spacings array for `seq`
+    #             seqSeparation[seq].append(i - seqStart)
+    return repeatedSeqs
+    
+def freqTest(s): # Test frequency of string against English language alphabet frequencies using Chi-Squared Test (0 is most accurate)
     # I tried using a basic variance from expected measure here, but found it didn't provide as good values
     # as using the Chi-Squared test.
     
@@ -178,8 +197,8 @@ def freqTest(message): # Test frequency of string against English language alpha
     }
     testStatistic = 0.0
     for c in ENGLISH_FREQ: # Iterate through all characters
-        if c in message:
-            freq = message.count(c) / len(message) # Get occurrence of character in shift
+        if c in s:
+            freq = s.count(c) / len(s) # Get occurrence of character in shift
             letterTestStatistic = ((freq - ENGLISH_FREQ[c]) ** 2) / ENGLISH_FREQ[c] #Get test statistic
             testStatistic += letterTestStatistic #Add test statistic to total
     return testStatistic
