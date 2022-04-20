@@ -12,7 +12,23 @@ python3 vigenere.py
 ```
 
 ## Demo
-...
+Using the plaintext:
+```
+At seventeen minutes past four in the afternoon, whilst the passengers were assembled at lunch in the great saloon, a slight shock was felt on the hull of the Scotia.
+```
+With key `KEY` gives the ciphertext:
+```
+Kx qozcxxcor ksrsdiq zeqd jmev gx xfo eddipxsmx, afspqd xfo tycwcxkcbw uovc kwqoqzvib kx jerar ml dlc qvckx qkpmyr, y cpgqlr clmmo ukw dopr yr rri fepj yj rri Qmsrse.
+```
+Decrypting with the provided key gives the same plaintext result.
+
+Solving for the key is given the ciphertext:
+```
+Kx qozcxxcor ksrsdiq zeqd jmev gx xfo eddipxsmx, afspqd xfo tycwcxkcbw uovc kwqoqzvib kx jerar ml dlc qvckx qkpmyr, y cpgqlr clmmo ukw dopr yr rri fepj yj rri Qmsrse.
+```
+It iterates through all keys from 1 to the length of the text (stripping non-alphabetical characters), and tests each key length. At each key length, it tests each individual subkey (key index), getting the letters that are relevant, shifting, and performing a Chi-Squared test. The best subkey at each index is then added to the main key for that length, and a total Chi-Squared value is calculated.
+
+The best key is then selected, output in the CLI, and used in the standard decryption function to give the plaintext.
 
 ## Challenges
 ### Frequency Testing
