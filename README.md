@@ -3,6 +3,17 @@ My implementation of the *Vigenere Cipher* in Python. I have documented a few ch
 
 The decryption/encryption methods work as expected, however I could implement a better key solving method.
 
+## Usage
+```
+python3 vigenere.py 
+    -m (e|encrypt, d|decrypt, s|solve, i|interactive) 
+    [-f <file> (required if -m not i|interactive)]
+    [-k <key> (required if -m e|encrypt)]
+```
+
+## Demo
+...
+
 ## Challenges
 ### Frequency Testing
 I had issues where the frequency test biased towards shorter key lengths, which I presumed was an issue with the Chi-Squared test used. 
