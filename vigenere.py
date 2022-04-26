@@ -21,12 +21,13 @@ def main(): # Welcome message and run menu
     mode = "" # Interactive for testing or if user wants a menu
     fileName = "" # File to parse
     key = "" # Required for encode.
+    max_key_length = 0 # Max key length to try solve, required for solve.
 
     try: # Attempt to parse arguments (Strip first argument (Command))
-        opts, args = getopt.getopt(sys.argv[1:], "hm:f:k:", ["help","mode=","file=","key="])
+        opts, args = getopt.getopt(sys.argv[1:], "hm:f:k:l:", ["help","mode=","file=","key=","length="])
     except:
         errorMessage("Unable to parse arguments!")
-        print('Usage: ./vigenere.py -m <mode> -f <file> -k <key>')
+        print('Usage: ./vigenere.py -m <mode> -f <file> -k <key> -l <maxkeylength>')
         print('Modes: e|encrypt')
         print('       d|decrypt')
         print('       s|solve')
@@ -35,7 +36,7 @@ def main(): # Welcome message and run menu
 
     for opt, arg in opts: # Assign from arguments 
         if opt in ["-h","--help"]:
-            print('Usage: ./vigenere.py -m <mode> -f <file> -k <key>')
+            print('Usage: ./vigenere.py -m <mode> -f <file> -k <key> -l <maxkeylength>')
             print('Modes: e|encrypt')
             print('       d|decrypt')
             print('       s|solve')
@@ -47,6 +48,8 @@ def main(): # Welcome message and run menu
             mode = arg
         elif opt in ["-k","--key"]:
             key = arg
+        elif opt in ["-l","--length"]:
+            max_key_length = int(arg)
 
     if mode == "interactive" or mode == "i":
         menu()
@@ -75,20 +78,21 @@ def main(): # Welcome message and run menu
                     return errorMessage("Key not specified!")
             elif mode == "solve" or mode == "s":
                 print("--- START DECRYPTION ---")
-                key = solve(text) # Find correct key
+                key = solve(text,max_key_length) # Find correct key
                 print("--- KEY SOLVED ---")
+                print(f"Key: {key}") # Decrypt string recursively, finding correct key
                 plaintext = decrypt(text, key)
                 with open(f"{fileName}.out", "w") as file: # Open file in write mode
                     file.write(plaintext) # Write decrypted string to file contents
                 print("--- FINISH DECRYPTION ---")
         else:
-            print('Usage: ./feistel.py -m <mode> -f <file> -k <key>')
+            print('Usage: ./feistel.py -m <mode> -f <file> -k <key> -l <maxkeylength>')
             print('Modes: e|encrypt')
             print('       d|decrypt')
             print('       i|interactive')
             return errorMessage("File not specified!")
     else:
-        print('Usage: ./feistel.py -m <mode> -f <file> -k <key>')
+        print('Usage: ./feistel.py -m <mode> -f <file> -k <key> -l <maxkeylength>')
         print('Modes: e|encrypt')
         print('       d|decrypt')
         print('       i|interactive')
@@ -150,11 +154,13 @@ def decrypt(ciphertext, key): # Decrypt string with given key
             plaintext += c
     return plaintext
 
-def solve(ciphertext): # Get key of encrypted string
+def solve(ciphertext, max_key_length=0): # Get key of encrypted string
     ciphertextTrimmed = [c for c in ciphertext.upper() if c in string.ascii_uppercase] # Only test all alphabetical characters
     # repeatedSequences = findRepeatedSequences(ciphertextTrimmed) # Attempt at Kasinski method.
     keys = []
-    for l in range(len(ciphertext)): # Try all possible key lengths
+    if(max_key_length == 0):
+        max_key_length = len(ciphertext)
+    for l in range(max_key_length): # Try all possible key lengths
         l += 1
         keyAccuracy = 0
         key = ""
